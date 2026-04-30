@@ -15,6 +15,9 @@ else
   exit 1
 fi
 
+# ✅ AUTO YES (không hỏi nữa)
+install_ubuntu="YES"
+
 if [ ! -e $ROOTFS_DIR/.installed ]; then
   echo "#######################################################################################"
   echo "#"
@@ -24,8 +27,7 @@ if [ ! -e $ROOTFS_DIR/.installed ]; then
   echo "#"
   echo "#"
   echo "#######################################################################################"
-
-  read -p "Do you want to install Ubuntu? (YES/no): " install_ubuntu
+  echo "Auto confirm: YES"
 fi
 
 case $install_ubuntu in
@@ -40,11 +42,11 @@ case $install_ubuntu in
 esac
 
 if [ ! -e $ROOTFS_DIR/.installed ]; then
-  mkdir $ROOTFS_DIR/usr/local/bin -p
+  mkdir -p $ROOTFS_DIR/usr/local/bin
   wget --tries=$max_retries --timeout=$timeout --no-hsts -O $ROOTFS_DIR/usr/local/bin/proot "https://raw.githubusercontent.com/foxytouxxx/freeroot/main/proot-${ARCH}"
 
   while [ ! -s "$ROOTFS_DIR/usr/local/bin/proot" ]; do
-    rm $ROOTFS_DIR/usr/local/bin/proot -rf
+    rm -rf $ROOTFS_DIR/usr/local/bin/proot
     wget --tries=$max_retries --timeout=$timeout --no-hsts -O $ROOTFS_DIR/usr/local/bin/proot "https://raw.githubusercontent.com/foxytouxxx/freeroot/main/proot-${ARCH}"
 
     if [ -s "$ROOTFS_DIR/usr/local/bin/proot" ]; then
@@ -59,7 +61,11 @@ if [ ! -e $ROOTFS_DIR/.installed ]; then
   chmod 755 $ROOTFS_DIR/usr/local/bin/proot
 fi
 
+# ✅ FIX lỗi /root không tồn tại
+mkdir -p $ROOTFS_DIR/root
+
 if [ ! -e $ROOTFS_DIR/.installed ]; then
+  mkdir -p ${ROOTFS_DIR}/etc
   printf "nameserver 1.1.1.1\nnameserver 1.0.0.1" > ${ROOTFS_DIR}/etc/resolv.conf
   rm -rf /tmp/rootfs.tar.xz /tmp/sbin
   touch $ROOTFS_DIR/.installed
@@ -67,7 +73,6 @@ fi
 
 CYAN='\e[0;36m'
 WHITE='\e[0;37m'
-
 RESET_COLOR='\e[0m'
 
 display_gg() {
